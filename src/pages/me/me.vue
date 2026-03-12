@@ -1,79 +1,155 @@
 <script lang="ts" setup>
-import { storeToRefs } from 'pinia'
-import { LOGIN_PAGE } from '@/router/config'
-import { useUserStore } from '@/store'
-import { useTokenStore } from '@/store/token'
+import { useStatusBar } from '@/hooks/useStatusBar'
+import { useBillStore } from '@/store/bill'
 
 definePage({
   style: {
-    navigationBarTitleText: '我的',
+    navigationStyle: 'custom',
+    navigationBarTitleText: '%tabbar.me%',
   },
 })
 
-const userStore = useUserStore()
-const tokenStore = useTokenStore()
-// 使用storeToRefs解构userInfo
-const { userInfo } = storeToRefs(userStore)
+const billStore = useBillStore()
+const { statusBarStyle } = useStatusBar()
+const totalStats = computed(() => billStore.getTotalStats())
 
-// 微信小程序下登录
-async function handleLogin() {
-  // #ifdef MP-WEIXIN
-  // 微信登录
-  await tokenStore.wxLogin()
-
-  // #endif
-  // #ifndef MP-WEIXIN
-  uni.navigateTo({
-    url: `${LOGIN_PAGE}`,
-  })
-  // #endif
+function formatAmount(amount: number) {
+  return amount.toFixed(2)
 }
 
-function handleLogout() {
+function handleClearData() {
   uni.showModal({
-    title: '提示',
-    content: '确定要退出登录吗？',
+    title: '清空所有数据',
+    content: '此操作将删除所有账单记录且不可恢复，确定继续吗？',
+    confirmText: '确定清空',
+    confirmColor: '#EF4444',
     success: (res) => {
       if (res.confirm) {
-        // 清空用户信息
-        useTokenStore().logout()
-        // 执行退出登录逻辑
-        uni.showToast({
-          title: '退出登录成功',
-          icon: 'success',
-        })
-        // #ifdef MP-WEIXIN
-        // 微信小程序，去首页
-        // uni.reLaunch({ url: '/pages/index/index' })
-        // #endif
-        // #ifndef MP-WEIXIN
-        // 非微信小程序，去登录页
-        // uni.navigateTo({ url: LOGIN_PAGE })
-        // #endif
+        billStore.clearAll()
+        uni.showToast({ title: '已清空所有数据', icon: 'success' })
       }
     },
   })
 }
+
+function handleExportTip() {
+  uni.showToast({ title: '功能开发中，敬请期待', icon: 'none' })
+}
 </script>
 
 <template>
-  <view class="profile-container">
-    <view class="mt-3 break-all px-3 text-center text-green-500">
-      {{ userInfo.username ? '已登录' : '未登录' }}
-    </view>
-    <view class="mt-3 break-all px-3">
-      {{ JSON.stringify(userInfo, null, 2) }}
-    </view>
+  <view class="min-h-screen bg-[#F7F8FA]">
+    <!-- 顶部安全区 -->
+    <view class="bg-[#374151] pt-safe" />
 
-    <view class="mt-[60vh] px-3">
-      <view class="m-auto w-160px text-center">
-        <button v-if="tokenStore.hasLogin" type="warn" class="w-full" @click="handleLogout">
-          退出登录
-        </button>
-        <button v-else type="primary" class="w-full" @click="handleLogin">
-          登录
-        </button>
+    <!-- 顶部头部区域 -->
+    <view class="bg-[#374151] px-4 pb-8 pt-3">
+      <text class="text-lg text-white font-bold">我的</text>
+      <view class="mt-4 flex items-center gap-4">
+        <view class="h-16 w-16 flex items-center justify-center rounded-full bg-white/20">
+          <view class="i-carbon-user text-3xl text-white" />
+        </view>
+        <view>
+          <text class="text-base text-white font-medium">记账本</text>
+          <text class="mt-1 block text-xs text-white/60">轻松管理您的每一笔收支</text>
+        </view>
       </view>
     </view>
+
+    <!-- 统计总览 -->
+    <view class="px-3 -mt-4">
+      <view class="overflow-hidden rounded-2xl bg-white shadow-sm">
+        <view class="border-b border-gray-50 px-4 py-3">
+          <text class="text-sm text-gray-600 font-medium">累计统计</text>
+        </view>
+        <view class="flex px-4 py-4">
+          <view class="flex-1 text-center">
+            <text class="block text-xs text-gray-400">总收入</text>
+            <text class="mt-1 block text-base text-[#07C160] font-bold">
+              ¥{{ formatAmount(totalStats.income) }}
+            </text>
+          </view>
+          <view class="w-px bg-gray-100" />
+          <view class="flex-1 text-center">
+            <text class="block text-xs text-gray-400">总支出</text>
+            <text class="mt-1 block text-base text-[#EF4444] font-bold">
+              ¥{{ formatAmount(totalStats.expense) }}
+            </text>
+          </view>
+          <view class="w-px bg-gray-100" />
+          <view class="flex-1 text-center">
+            <text class="block text-xs text-gray-400">账单笔数</text>
+            <text class="mt-1 block text-base text-gray-700 font-bold">
+              {{ totalStats.count }}
+            </text>
+          </view>
+        </view>
+        <!-- 净资产 -->
+        <view class="mx-4 mb-4 rounded-xl px-4 py-3" :class="totalStats.balance >= 0 ? 'bg-green-50' : 'bg-red-50'">
+          <view class="flex items-center justify-between">
+            <text class="text-sm text-gray-500">累计结余</text>
+            <text
+              class="text-lg font-bold"
+              :class="totalStats.balance >= 0 ? 'text-[#07C160]' : 'text-[#EF4444]'"
+            >
+              {{ totalStats.balance >= 0 ? '+' : '' }}¥{{ formatAmount(totalStats.balance) }}
+            </text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 功能列表 -->
+      <view class="mt-3 overflow-hidden rounded-2xl bg-white shadow-sm">
+        <view class="border-b border-gray-50 px-4 py-3">
+          <text class="text-sm text-gray-600 font-medium">数据管理</text>
+        </view>
+
+        <!-- 导出数据 -->
+        <view
+          class="flex items-center border-b border-gray-50 px-4 py-4 active:bg-gray-50"
+          @click="handleExportTip"
+        >
+          <view class="mr-3 h-9 w-9 flex items-center justify-center rounded-xl bg-blue-50">
+            <view class="i-carbon-information text-xl text-blue-400" />
+          </view>
+          <text class="flex-1 text-sm text-gray-700">导出账单</text>
+          <view class="i-carbon-chevron-right text-sm text-gray-300" />
+        </view>
+
+        <!-- 清空数据 -->
+        <view
+          class="flex items-center px-4 py-4 active:bg-gray-50"
+          @click="handleClearData"
+        >
+          <view class="mr-3 h-9 w-9 flex items-center justify-center rounded-xl bg-red-50">
+            <view class="i-carbon-trash-can text-xl text-red-400" />
+          </view>
+          <text class="flex-1 text-sm text-gray-700">清空所有数据</text>
+          <view class="i-carbon-chevron-right text-sm text-gray-300" />
+        </view>
+      </view>
+
+      <!-- 关于 -->
+      <view class="mt-3 overflow-hidden rounded-2xl bg-white shadow-sm">
+        <view class="border-b border-gray-50 px-4 py-3">
+          <text class="text-sm text-gray-600 font-medium">关于</text>
+        </view>
+        <view class="px-4 py-4">
+          <view class="flex items-center justify-between">
+            <text class="text-sm text-gray-500">版本</text>
+            <text class="text-sm text-gray-400">v1.0.0</text>
+          </view>
+          <view class="mt-3 flex items-center justify-between">
+            <text class="text-sm text-gray-500">技术栈</text>
+            <text class="text-sm text-gray-400">uni-app + Vue3 + Pinia</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 底部留白 -->
+      <view class="h-6 pb-safe" />
+    </view>
+
+    <tabbar />
   </view>
 </template>

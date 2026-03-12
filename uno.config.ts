@@ -71,7 +71,39 @@ export default defineConfig({
     },
   ],
   // 动态图标需要在这里配置，或者写在vue页面中注释掉
-  safelist: ['i-carbon-code', 'i-carbon-home', 'i-carbon-user'],
+  safelist: [
+    // 原有图标
+    'i-carbon-code',
+    'i-carbon-home',
+    'i-carbon-user',
+    // Tabbar 图标
+    'i-carbon-wallet',
+    'i-carbon-chart-bar',
+    // 支出分类图标
+    'i-carbon-restaurant',
+    'i-carbon-car',
+    'i-carbon-shopping-cart',
+    'i-carbon-game',
+    'i-carbon-hospital',
+    'i-carbon-education',
+    'i-carbon-overflow-menu-horizontal',
+    // 收入分类图标
+    'i-carbon-money',
+    'i-carbon-collaborate',
+    'i-carbon-chart-line',
+    'i-carbon-gift',
+    // UI 操作图标
+    'i-carbon-chevron-left',
+    'i-carbon-chevron-right',
+    'i-carbon-add',
+    'i-carbon-notebook',
+    'i-carbon-trash-can',
+    'i-carbon-checkmark',
+    'i-carbon-close',
+    'i-carbon-settings',
+    'i-carbon-information',
+    'i-carbon-warning',
+  ],
   rules: [
     [
       'p-safe',
