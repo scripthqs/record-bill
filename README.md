@@ -60,7 +60,8 @@
 - Vue Official>=2.1.10
 - TypeScript>=5.0
 
-## 新版分支 
+## 新版分支
+
 - main == base
 - base --> base-i18n
 - base-login --> base-login-i18n
@@ -88,11 +89,4 @@
 
 [MIT](https://opensource.org/license/mit/)
 
-Copyright (c) 2025 菲鸽
-
-## 捐赠
-
-<p align='center'>
-<img alt="special sponsor appwrite" src="https://oss.laf.run/ukw0y1-site/pay/wepay.png" height="330" style="display:inline-block; height:330px;">
-<img alt="special sponsor appwrite" src="https://oss.laf.run/ukw0y1-site/pay/alipay.jpg" height="330" style="display:inline-block; height:330px; margin-left:10px;">
-</p>
+Copyright (c) 2025 projectAuthor

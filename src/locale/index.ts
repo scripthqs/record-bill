@@ -51,7 +51,7 @@ export function getTemplateByKey(key: string) {
  * formatI18n('我是{name},身高{detail.height},体重{detail.weight}',{name:'张三',detail:{height:178,weight:'75kg'}})
  * 暂不支持数组
  * @param template 多语言模板字符串，eg: `我是{name}`
- * @param {object | undefined} data 需要传递的数据对象，里面的key与多语言字符串对应，eg: `{name:'菲鸽'}`
+ * @param {object | undefined} data 需要传递的数据对象，里面的key与多语言字符串对应，eg: `{name:'projectAuthor'}`
  * @returns
  */
 function formatI18n(template: string, data?: any) {
@@ -72,7 +72,7 @@ function formatI18n(template: string, data?: any) {
  * => formatI18n('我是{name},身高{detail.height},体重{detail.weight}',{name:'张三',detail:{height:178,weight:'75kg'}})
  * 没有key的，可以不传 data；暂不支持数组
  * @param template 多语言模板字符串，eg: `我是{name}`
- * @param {object | undefined} data 需要传递的数据对象，里面的key与多语言字符串对应，eg: `{name:'菲鸽'}`
+ * @param {object | undefined} data 需要传递的数据对象，里面的key与多语言字符串对应，eg: `{name:'projectAuthor'}`
  * @returns
  */
 export function t(key, data?) {
